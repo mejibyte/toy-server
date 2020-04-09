@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: toy-server-pod1
+spec:
+  containers:
+  - name: toy-server
+    image: mejibyte/toy-server:stable
+

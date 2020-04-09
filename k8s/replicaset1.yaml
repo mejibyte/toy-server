@@ -1,0 +1,19 @@
+apiVersion: apps/v1
+kind: ReplicaSet
+metadata:
+  name: toy-server-rs1
+spec:
+  # modify replicas according to your case
+  replicas: 2
+  selector:
+    matchLabels:
+      manager: toy-server-rs1
+  template:
+    metadata:
+      labels:
+        manager: toy-server-rs1
+    spec:
+        containers:
+        - name: toy-server
+          image: mejibyte/toy-server:stable
+
