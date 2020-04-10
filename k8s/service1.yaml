@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: toy-server-service1
+spec:
+  type: LoadBalancer
+  selector:
+    app: webserver
+  ports:
+    - name: webapp
+      protocol: TCP
+      port: 5000
+      targetPort: webapp
+    - name: nginx
+      protocol: TCP
+      port: 5001
+      targetPort: nginx

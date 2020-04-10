@@ -16,3 +16,11 @@ $ kubectl get -f k8s/
 ```
 $ kubectl delete -f k8s/
 ```
+
+# Seeing Service
+
+After creating Service, run:
+
+```
+$ minikube service toy-server-service1
+```

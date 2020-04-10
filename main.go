@@ -11,6 +11,13 @@ import (
 )
 
 func index(w http.ResponseWriter, r *http.Request) {
+	// Pass ?close=true to close the connection an disable KeepAlive. Useful to
+	// refresh in Chrome and see if load balancing is working.
+	if v := r.URL.Query()["close"]; len(v) > 0 && v[0] == "true" {
+		w.Header().Set("Connection", "close")
+	}
+
+	fmt.Fprintf(w, "Current time: %v\n", time.Now())
 	hostname, err := os.Hostname()
 	if err != nil {
 		hostname = err.Error()
@@ -18,6 +25,11 @@ func index(w http.ResponseWriter, r *http.Request) {
 	request, err := httputil.DumpRequest(r, true)
 	if err != nil {
 		request = []byte(err.Error())
+	}
+
+	fmt.Fprintf(w, "Env:\n")
+	for _, kv := range os.Environ() {
+		fmt.Fprintf(w, "  %s\n", kv)
 	}
 
 	fmt.Fprintf(w, "Hostname: %s\n", hostname)

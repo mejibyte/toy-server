@@ -3,21 +3,58 @@ kind: Deployment
 metadata:
   name: toy-server-deployment1
 spec:
-  replicas: 3
+  replicas: 6
+  # .spec.minReadySeconds is an optional field that specifies the minimum number
+  # of seconds for which a newly created Pod should be ready without any of its
+  # containers crashing, for it to be considered available.
+  # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#min-ready-seconds
+  minReadySeconds: 3
+  strategy:
+    rollingUpdate:
+        maxUnavailable: 1
+        maxSurge: 0
   selector:
     matchLabels:
       manager: toy-server-deployment1
-  template:
+      app: webserver
+  template: # pod template
     metadata:
       labels:
         manager: toy-server-deployment1
+        app: webserver
     spec:
       containers:
       - name: nginx
-        image: nginx:1.14.2
+        image: nginx:1.16
         ports:
-        - containerPort: 8080
+        - name: nginx
+          containerPort: 80
       - name: toy-server
         image: mejibyte/toy-server:stable
+        imagePullPolicy: Always
         ports:
-        - containerPort: 80
+        - name: webapp
+          containerPort: 3000
+        env:
+          - name: USERNAME
+            value: mejibyte
+          - name: MY_NODE_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: spec.nodeName
+          - name: MY_POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: MY_POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                  fieldPath: metadata.namespace
+          - name: MY_POD_IP
+            valueFrom:
+              fieldRef:
+                  fieldPath: status.podIP
+          - name: MY_POD_SERVICE_ACCOUNT
+            valueFrom:
+              fieldRef:
+                  fieldPath: spec.serviceAccountName
