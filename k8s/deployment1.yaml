@@ -3,16 +3,16 @@ kind: Deployment
 metadata:
   name: toy-server-deployment1
 spec:
-  replicas: 6
+  replicas: 3
   # .spec.minReadySeconds is an optional field that specifies the minimum number
   # of seconds for which a newly created Pod should be ready without any of its
   # containers crashing, for it to be considered available.
   # https://kubernetes.io/docs/concepts/workloads/controllers/deployment/#min-ready-seconds
-  minReadySeconds: 3
+  minReadySeconds: 10
   strategy:
     rollingUpdate:
-        maxUnavailable: 1
-        maxSurge: 0
+        maxUnavailable: 10
+        maxSurge: 10
   selector:
     matchLabels:
       manager: toy-server-deployment1
@@ -23,9 +23,10 @@ spec:
         manager: toy-server-deployment1
         app: webserver
     spec:
+      terminationGracePeriodSeconds: 120
       containers:
       - name: nginx
-        image: nginx:1.16
+        image: nginx:1.14
         ports:
         - name: nginx
           containerPort: 80

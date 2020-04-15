@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httputil"
 	"os"
+	"os/signal"
 	"time"
 )
 
@@ -45,9 +46,29 @@ func kill(w http.ResponseWriter, r *http.Request) {
 	}()
 }
 
+func catchSignals(c <-chan os.Signal) {
+	count := 0
+	for {
+		s := <-c
+		//count++
+		if count >= 5 {
+			log.Printf("Caught %dth signal %v. Quitting.", count, s)
+			os.Exit(1)
+		} else {
+			log.Printf("Caught %dth signal %v. Ignoring it...", count, s)
+		}
+	}
+}
+
 func main() {
 	var port = flag.Int("port", 3000, "The port to run the HTTP server")
 	flag.Parse()
+
+	c := make(chan os.Signal, 1)
+	// Passing no signals to Notify means that
+	// all signals will be sent to the channel.
+	signal.Notify(c)
+	go catchSignals(c)
 
 	http.HandleFunc("/", index)
 	http.HandleFunc("/kill", kill)
